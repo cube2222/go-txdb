@@ -57,6 +57,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"io"
+	"log"
 	"sync"
 )
 
@@ -143,6 +144,9 @@ func (d *txDriver) Open(dsn string) (driver.Conn, error) {
 		d.conns[dsn] = c
 	}
 	c.opened++ // safe since conn.Close() must acquire driver lock first
+	if c.opened > 1 {
+		log.Fatalln("txdb: More than one connection opened.")
+	}
 	return c, nil
 }
 
